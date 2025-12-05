@@ -13,6 +13,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Print host
+        run: echo ${{ secrets.DEPLOY_HOST }}
 
         
       - name: Deploy Docker Compose
