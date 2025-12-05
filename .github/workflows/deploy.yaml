@@ -30,6 +30,12 @@ jobs:
               git pull origin main
             fi
             cd $PROJECT_DIR
+            mkdir -p infra/secrets
+            echo "${{ secrets.MINIO_PASSWORD }}" > infra/secrets/minio_password.txt
+            echo "${{ secrets.DB_PASSWORD }}" > infra/secrets/db_password.txt
+
+            mkdir -p infra/data/minio
+            
             docker-compose down
             docker-compose pull
             docker-compose up -d --build
