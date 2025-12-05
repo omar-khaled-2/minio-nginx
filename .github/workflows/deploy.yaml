@@ -1,0 +1,36 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Deploy Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            PROJECT_DIR="/home/sphinx/Development/minio-nginx/infra"
+            if [ ! -d "$PROJECT_DIR/.git" ]; then
+              git clone -b main https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
+            else
+              cd $PROJECT_DIR
+              git reset --hard
+              git pull origin main
+            fi
+            cd $PROJECT_DIR
+            docker-compose down
+            docker-compose pull
+            docker-compose up -d --build
+          EOF
