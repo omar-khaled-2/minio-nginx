@@ -25,7 +25,7 @@ jobs:
           password: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
-            PROJECT_DIR="/home/sphinx/Development/minio-nginx/infra"
+            PROJECT_DIR="/home/devuser/Development/minio-nginx/infra"
             if [ ! -d "$PROJECT_DIR/.git" ]; then
               git clone -b main https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
             else
