@@ -26,6 +26,7 @@ jobs:
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
             PROJECT_DIR="/home/devuser/minio-nginx"
+            export HOST_ENDPOINT=${{ vars.HOST_ENDPOINT }}
             if [ ! -d "$PROJECT_DIR/.git" ]; then
               git clone -b main https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
             else
@@ -37,9 +38,10 @@ jobs:
             mkdir -p secrets
             echo "${{ secrets.MINIO_PASSWORD }}" > secrets/minio_password.txt
             echo "${{ secrets.DB_PASSWORD }}" > secrets/db_password.txt
-
+            echo "${{ secrets.HOST_ENDPOINT }}" > secrets/host_endpoint.txt
             mkdir -p data/minio
 
             docker compose down
             docker compose pull
             docker compose up -d --build
+          
