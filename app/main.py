@@ -21,7 +21,7 @@ def main():
     print(os.getenv("MINIO_ROOT_USER"), secret.get("MINIO_PASSWORD"))
 
     print("Creating bucketss")
-    s3_client.create_bucket(Bucket='tests')
+    s3_client.create_bucket(Bucket='testsss')
 
     # while True:
     #     print("")
