@@ -45,6 +45,5 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: staging
+          branch: auto-update-branch
           token: ${{ secrets.PERSONAL_TOKEN }}
-          base: main
