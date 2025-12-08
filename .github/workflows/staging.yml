@@ -42,13 +42,5 @@ jobs:
       #       docker compose pull
       #       docker compose up -d --build
 
-      - name: Create or update PR to main
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: auto/pr-staging-to-main
-          base: main
-          title: "Auto PR: staging → main"
-          body: "Automatic PR created by GitHub Actions"
-          draft: false
-          
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
