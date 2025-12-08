@@ -50,3 +50,4 @@ jobs:
         with:
           branch: auto-update-branch
           token: ${{ secrets.PERSONAL_TOKEN }}
+          base: main
