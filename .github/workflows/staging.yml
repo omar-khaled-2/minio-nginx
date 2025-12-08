@@ -49,8 +49,9 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: staging
+          branch: auto/pr-staging-to-main
           base: main
           title: "Auto PR: staging → main"
           body: "Automatic PR created by GitHub Actions"
           draft: false
+          
