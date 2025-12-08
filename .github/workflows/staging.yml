@@ -1,4 +1,4 @@
-name: deploy
+name: Staging Workflow
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
         run: echo ${{ secrets.DEPLOY_HOST }}
 
         
-      - name: Deploy Docker Compose
+      - name: Deploy Docker Compose On Staging
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -44,4 +44,13 @@ jobs:
             docker compose down
             docker compose pull
             docker compose up -d --build
-          
+
+      - name: Create or update PR to main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: staging
+          base: main
+          title: "Auto PR: staging → main"
+          body: "Automatic PR created by GitHub Actions"
+          draft: false
