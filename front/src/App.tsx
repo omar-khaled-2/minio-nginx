@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 function App() {
 
-  const [count, setCount] = React.useState(0);
+  const [count, setCount] = React.useState(5);
 
   useEffect(() => {
     const interval = setInterval(() => {
