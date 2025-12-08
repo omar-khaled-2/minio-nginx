@@ -45,7 +45,7 @@ jobs:
       - name: Create pull request
         id: pr
         run: |
-          PR_URL=$(gh pr create -B main -H staging --title 'staging into main' --body 'Created by Github action' --json url -q .url)
+          PR_URL=$(gh pr create -B main -H staging --title 'staging into main' --body 'Created by Github action')
           echo "PR_URL=$PR_URL" >> $GITHUB_ENV
           echo "Pull request created: $PR_URL"
         env:
