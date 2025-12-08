@@ -41,6 +41,9 @@ jobs:
       #       docker compose down
       #       docker compose pull
       #       docker compose up -d --build
+      - name: Push to new branch
+        run: |
+          git checkout -b auto-update-branch
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
