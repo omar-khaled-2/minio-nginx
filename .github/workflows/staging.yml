@@ -12,10 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Print host
-        run: echo ${{ secrets.DEPLOY_HOST }}
-
+        with:
+          fetch-depth: 0 
         
       - name: Deploy Docker Compose On Staging
         uses: appleboy/ssh-action@v1
@@ -28,11 +26,11 @@ jobs:
             PROJECT_DIR="/home/devuser/minio-nginx"
             export HOST_ENDPOINT=${{ vars.HOST_ENDPOINT }}
             if [ ! -d "$PROJECT_DIR/.git" ]; then
-              git clone -b main https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
+              git clone -b staging https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
             else
               cd $PROJECT_DIR
               git reset --hard
-              git pull origin main
+              git pull origin staging
             fi
             cd $PROJECT_DIR/infra
             mkdir -p secrets
