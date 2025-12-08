@@ -5,44 +5,64 @@ on:
     branches:
       - staging
 
-
 jobs:
   deploy:
+    name: Deploy to Staging
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Deploy Docker Compose On Staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            PROJECT_DIR="/home/devuser/minio-nginx"
+            export HOST_ENDPOINT=${{ vars.HOST_ENDPOINT }}
+            if [ ! -d "$PROJECT_DIR/.git" ]; then
+              git clone -b staging https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
+            else
+              cd $PROJECT_DIR
+              git reset --hard
+              git pull origin staging
+            fi
+            cd $PROJECT_DIR/infra
+            mkdir -p secrets
+            echo "${{ secrets.MINIO_PASSWORD }}" > secrets/minio_password.txt
+            echo "${{ secrets.DB_PASSWORD }}" > secrets/db_password.txt
+            echo "${{ secrets.HOST_ENDPOINT }}" > secrets/host_endpoint.txt
+            mkdir -p data/minio
 
-      # - name: Deploy Docker Compose On Staging
-      #   uses: appleboy/ssh-action@v1
-      #   with:
-      #     host: ${{ secrets.DEPLOY_HOST }}
-      #     username: ${{ secrets.DEPLOY_USER }}
-      #     password: ${{ secrets.DEPLOY_SSH_KEY }}
-      #     port: ${{ secrets.DEPLOY_PORT }}
-      #     script: |
-      #       PROJECT_DIR="/home/devuser/minio-nginx"
-      #       export HOST_ENDPOINT=${{ vars.HOST_ENDPOINT }}
-      #       if [ ! -d "$PROJECT_DIR/.git" ]; then
-      #         git clone -b staging https://github.com/omar-khaled-2/minio-nginx.git $PROJECT_DIR
-      #       else
-      #         cd $PROJECT_DIR
-      #         git reset --hard
-      #         git pull origin staging
-      #       fi
-      #       cd $PROJECT_DIR/infra
-      #       mkdir -p secrets
-      #       echo "${{ secrets.MINIO_PASSWORD }}" > secrets/minio_password.txt
-      #       echo "${{ secrets.DB_PASSWORD }}" > secrets/db_password.txt
-      #       echo "${{ secrets.HOST_ENDPOINT }}" > secrets/host_endpoint.txt
-      #       mkdir -p data/minio
+            docker compose down
+            docker compose pull
+            docker compose up -d --build
 
-      #       docker compose down
-      #       docker compose pull
-      #       docker compose up -d --build
+  create_pr:
+    name: Create Pull Request
+    runs-on: ubuntu-latest
+    needs: deploy  # wait for deploy job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: create pull request
-        run: gh pr create -B main -H staging --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+      - name: Create pull request
+        id: pr
+        run: |
+          PR_URL=$(gh pr create -B main -H staging --title 'staging into main' --body 'Created by Github action')
+          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+          echo "Pull request created: $PR_URL"
         env:
-            GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+
+  use_pr:
+    name: Use PR URL
+    runs-on: ubuntu-latest
+    needs: create_pr
+    steps:
+      - name: Print PR URL
+        run: |
+          echo "The PR link is $PR_URL"
